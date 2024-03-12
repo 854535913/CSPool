@@ -1,21 +1,27 @@
 package service
 
 import (
-	"errors"
+	"database/sql"
 	mysqlmodule "main/dao/mysql"
 	"main/model"
 )
 
-func RegisterService(inputinfo model.RegisterInfo) (err error) {
-	if mysqlmodule.CheckUserExist(inputinfo.Username) {
-		return errors.New("this username is registered")
+func RegisterService(db *sql.DB, inputinfo model.RegisterInfo) (err error) {
+	exist, err := mysqlmodule.CheckUserExist(db, inputinfo.Username)
+	if err != nil {
+		return err
+	} else if exist {
+		return mysqlmodule.ErrorUserExist
 	}
-
-	mysqlmodule.InsertUser(
+	level, err := mysqlmodule.InvitationVerify(db, inputinfo.InvitationCode)
+	if err != nil {
+		return err
+	}
+	err = mysqlmodule.InsertUser(db,
 		model.UserInfo{
 			Username: inputinfo.Username,
 			Password: inputinfo.Password,
-			Level:    mysqlmodule.InvitationVerify(inputinfo.InvitationCode),
+			Level:    level,
 		})
-	return
+	return err
 }

@@ -3,6 +3,7 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 	"main/controller"
+	mysqlmodule "main/dao/mysql"
 	"net/http"
 )
 
@@ -11,7 +12,10 @@ func Init() *gin.Engine {
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
-	r.POST("/register", controller.RegisterHandler)
+	r.POST("/register", func(c *gin.Context) {
+		controller.RegisterHandler(c, mysqlmodule.Sdb)
+	})
+
 	r.POST("/login", controller.LoginHandler)
 
 	videoGroup := r.Group("/video", controller.JWTAuthMiddleware())

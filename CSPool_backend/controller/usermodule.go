@@ -1,52 +1,49 @@
 package controller
 
 import (
+	"database/sql"
+	"errors"
 	"github.com/gin-gonic/gin"
+	mysqlmodule "main/dao/mysql"
 	"main/model"
 	"main/service"
-	"net/http"
 )
 
-func RegisterHandler(c *gin.Context) {
+func RegisterHandler(c *gin.Context, db *sql.DB) {
 	var input model.RegisterInfo
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": err.Error(),
-		})
+		ResponseErrorWithMsg(c, CodeInvalidParam, err.Error())
 		return
 	}
 
-	if err := service.RegisterService(input); err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": err.Error(),
-		})
+	if err := service.RegisterService(db, input); err != nil {
+		if errors.Is(err, mysqlmodule.ErrorUserExist) {
+			ResponseError(c, CodeUserExist)
+			return
+		}
+		ResponseErrorWithMsg(c, CodeUnexpectedError, err.Error())
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"msg": "Register success",
-	})
+	ResponseSuccess(c, nil)
 }
 
 func LoginHandler(c *gin.Context) {
 	var input model.LoginInfo
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": err.Error(),
-		})
+		ResponseErrorWithMsg(c, CodeInvalidParam, err.Error())
 		return
 	}
-
 	token, err := service.LoginService(input)
 	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"msg": err.Error(),
-		})
+		if errors.Is(err, mysqlmodule.ErrorUserNotExist) {
+			ResponseError(c, CodeUserNotExist)
+			return
+		} else if errors.Is(err, mysqlmodule.ErrorInvalidPassword) {
+			ResponseError(c, CodeInvalidPassword)
+			return
+		}
+		ResponseErrorWithMsg(c, CodeUnexpectedError, err.Error())
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"msg":   "Login success",
-		"token": token,
-	})
+	ResponseSuccess(c, token)
 }

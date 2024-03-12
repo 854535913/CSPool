@@ -37,7 +37,6 @@ func GenerateTokenService(userid int64, username string) (string, error) {
 // DecryptTokenService 解析JWT
 func DecryptTokenService(tokenString string) (*CustomClaims, error) {
 	// 解析token
-	// 如果是自定义Claim结构体则需要使用 ParseWithClaims 方法
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (i interface{}, err error) {
 		return SecretKey, nil
 	})

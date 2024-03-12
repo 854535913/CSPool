@@ -1,48 +1,40 @@
 package mysqlmodule
 
 import (
+	"database/sql"
 	"log"
 	"main/model"
 )
 
-func CheckUserExist(username string) (exist bool) {
+func CheckUserExist(db *sql.DB, username string) (exist bool, err error) {
 	sqlStr := "SELECT EXISTS(SELECT 1 FROM user WHERE username = ?)"
-	err := Sdb.QueryRow(sqlStr, username).Scan(&exist)
-	if err != nil {
-		log.Fatalf("Failed to check user exist: %v", err)
-	}
-	return exist
+	err = db.QueryRow(sqlStr, username).Scan(&exist)
+	return exist, err
 }
 
-func InvitationVerify(invitationcode string) int8 {
+func InvitationVerify(db *sql.DB, invitationcode string) (level int8, err error) {
 	var exists bool
 	sqlStr := "SELECT EXISTS(SELECT 1 FROM invitation WHERE code = ?)"
-	err := Sdb.QueryRow(sqlStr, invitationcode).Scan(&exists)
+	err = db.QueryRow(sqlStr, invitationcode).Scan(&exists)
 	if err != nil {
-		log.Fatalf("Failed to check invitation code: %v", err)
+		return 0, err
 	}
 	if exists {
-		return 2
+		return 2, nil
 	}
-	return 3
+	return 3, nil
 }
 
-func InsertUser(info model.UserInfo) {
+func InsertUser(db *sql.DB, info model.UserInfo) (err error) {
 	sqlStr := "insert into user(username, password, level) values(?,?,?)"
-	_, err := Sdb.Exec(sqlStr, info.Username, info.Password, info.Level)
-	if err != nil {
-		log.Fatalf("Failed to insert user: %v", err)
-	}
-	return
+	_, err = db.Exec(sqlStr, info.Username, info.Password, info.Level)
+	return err
 }
 
-func Login(info model.LoginInfo) (match bool) {
+func Login(info model.LoginInfo) (match bool, err error) {
 	sqlStr := "SELECT EXISTS(SELECT 1 FROM user WHERE username = ? AND password = ?)"
-	err := Sdb.QueryRow(sqlStr, info.Username, info.Password).Scan(&match)
-	if err != nil {
-		log.Fatalf("Failed to login: %v", err)
-	}
-	return match
+	err = Sdb.QueryRow(sqlStr, info.Username, info.Password).Scan(&match)
+	return match, err
 }
 
 func GetID(username string) (id int64) {

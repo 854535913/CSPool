@@ -1,18 +1,23 @@
 package service
 
 import (
-	"errors"
 	mysqlmodule "main/dao/mysql"
 	"main/model"
 )
 
 func LoginService(inputinfo model.LoginInfo) (token string, err error) {
-	if !mysqlmodule.CheckUserExist(inputinfo.Username) {
-		return "", errors.New("invalid username")
+	exist, err := mysqlmodule.CheckUserExist(mysqlmodule.Sdb, inputinfo.Username)
+	if err != nil {
+		return "", err
+	} else if !exist {
+		return "", mysqlmodule.ErrorUserNotExist
 	}
 
-	if !mysqlmodule.Login(inputinfo) {
-		return "", errors.New("login failed, invalid username or password")
+	match, err := mysqlmodule.Login(inputinfo)
+	if err != nil {
+		return "", err
+	} else if !match {
+		return "", mysqlmodule.ErrorInvalidPassword
 	}
 
 	return GenerateTokenService(mysqlmodule.GetID(inputinfo.Username), inputinfo.Username)

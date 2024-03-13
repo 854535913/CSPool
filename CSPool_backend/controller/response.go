@@ -14,7 +14,19 @@ const (
 	CodeUserExist
 	CodeUserNotExist
 	CodeInvalidPassword
+	CodeCantGetUsername
 	CodeServerBusy
+
+	CodeTitleExist
+	CodePostNotApprove
+	CodeInvalidPostID
+	CodePostPublished
+	CodeNeedLevel
+	CodeVoteLike
+	CodeVoteDislike
+	CodeVoteCancel
+	CodeVoteInvalidStatus
+	CodeVoteInvalidAction
 
 	CodeNeedLogin
 	CodeTokenFormatError
@@ -28,7 +40,19 @@ var codeMsgMap = map[ResCode]string{
 	CodeUserExist:       "用户名已存在",
 	CodeUserNotExist:    "用户名不存在",
 	CodeInvalidPassword: "用户名或密码错误",
+	CodeCantGetUsername: "无法获取用户名",
 	CodeServerBusy:      "服务繁忙",
+
+	CodeTitleExist:        "标题已存在",
+	CodePostNotApprove:    "帖子没有获得管理员许可",
+	CodeInvalidPostID:     "贴子ID错误",
+	CodePostPublished:     "贴子已发布",
+	CodeNeedLevel:         "没有审核权限",
+	CodeVoteLike:          "已经喜欢这个贴子了",
+	CodeVoteDislike:       "已经不喜欢这个贴子了",
+	CodeVoteCancel:        "已经取消了",
+	CodeVoteInvalidStatus: "状态参数错误",
+	CodeVoteInvalidAction: "错误的动作",
 
 	CodeNeedLogin:        "需要登录",
 	CodeTokenFormatError: "token格式错误",

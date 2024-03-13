@@ -31,26 +31,26 @@ func InsertUser(db *sql.DB, info model.UserInfo) (err error) {
 	return err
 }
 
-func Login(info model.LoginInfo) (match bool, err error) {
+func Login(db *sql.DB, info model.LoginInfo) (match bool, err error) {
 	sqlStr := "SELECT EXISTS(SELECT 1 FROM user WHERE username = ? AND password = ?)"
-	err = Sdb.QueryRow(sqlStr, info.Username, info.Password).Scan(&match)
+	err = db.QueryRow(sqlStr, info.Username, info.Password).Scan(&match)
 	return match, err
 }
 
-func GetID(username string) (id int64) {
+func GetID(db *sql.DB, username string) (id int64, err error) {
 	sqlStr := "SELECT id FROM user WHERE username = ?"
-	err := Sdb.QueryRow(sqlStr, username).Scan(&id)
+	err = db.QueryRow(sqlStr, username).Scan(&id)
 	if err != nil {
 		log.Fatalf("Failed to get ID: %v", err)
 	}
-	return id
+	return id, err
 }
 
-func GetLevel(username string) (level int8) {
+func GetLevel(db *sql.DB, username string) (level int8, err error) {
 	sqlStr := "SELECT level FROM user WHERE username = ?"
-	err := Sdb.QueryRow(sqlStr, username).Scan(&level)
+	err = db.QueryRow(sqlStr, username).Scan(&level)
 	if err != nil {
 		log.Fatalf("Failed to get level: %v", err)
 	}
-	return level
+	return level, err
 }

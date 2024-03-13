@@ -27,13 +27,13 @@ func RegisterHandler(c *gin.Context, db *sql.DB) {
 	ResponseSuccess(c, nil)
 }
 
-func LoginHandler(c *gin.Context) {
+func LoginHandler(c *gin.Context, db *sql.DB) {
 	var input model.LoginInfo
 	if err := c.ShouldBindJSON(&input); err != nil {
 		ResponseErrorWithMsg(c, CodeInvalidParam, err.Error())
 		return
 	}
-	token, err := service.LoginService(input)
+	token, err := service.LoginService(db, input)
 	if err != nil {
 		if errors.Is(err, mysqlmodule.ErrorUserNotExist) {
 			ResponseError(c, CodeUserNotExist)

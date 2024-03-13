@@ -1,31 +1,40 @@
 package service
 
 import (
+	"database/sql"
 	mysqlmodule "main/dao/mysql"
 	"main/model"
 )
 
-func LoginService(inputinfo model.LoginInfo) (token string, err error) {
-	exist, err := mysqlmodule.CheckUserExist(mysqlmodule.Sdb, inputinfo.Username)
+func LoginService(db *sql.DB, inputinfo model.LoginInfo) (token string, err error) {
+	exist, err := mysqlmodule.CheckUserExist(db, inputinfo.Username)
 	if err != nil {
 		return "", err
 	} else if !exist {
 		return "", mysqlmodule.ErrorUserNotExist
 	}
 
-	match, err := mysqlmodule.Login(inputinfo)
+	match, err := mysqlmodule.Login(db, inputinfo)
 	if err != nil {
 		return "", err
 	} else if !match {
 		return "", mysqlmodule.ErrorInvalidPassword
 	}
 
-	return GenerateTokenService(mysqlmodule.GetID(inputinfo.Username), inputinfo.Username)
+	id, err := mysqlmodule.GetID(db, inputinfo.Username)
+	if err != nil {
+		return "", err
+	}
+	return GenerateTokenService(id, inputinfo.Username)
 }
 
-func CheckLevelService(username string) bool {
-	if mysqlmodule.GetLevel(username) > 2 {
-		return false
+func CheckLevelService(db *sql.DB, username string) (allow bool, err error) {
+	level, err := mysqlmodule.GetLevel(db, username)
+	if err != nil {
+		return false, err
 	}
-	return true
+	if level > 2 {
+		return false, err
+	}
+	return true, err
 }

@@ -12,22 +12,21 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestRegisterHandler_Success(t *testing.T) {
+func TestLoginHandler_Success(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	if err := InitMySQL(); err != nil {
 		t.Fatalf("MySQL start failed, err:%v\n", err)
 	}
 	defer sdbTest.Close()
-	url := "/register"
+	url := "/login"
 	r.POST(url, func(c *gin.Context) {
-		controller.RegisterHandler(c, sdbTest)
+		controller.LoginHandler(c, sdbTest)
 	})
 
 	body := `{
-		"username" : "user3",
-        "password" : "1234",
-        "re_password":"1234"
+		"username" : "xiaohao",
+        "password" : "1234"
 	}`
 
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewReader([]byte(body)))
@@ -44,22 +43,21 @@ func TestRegisterHandler_Success(t *testing.T) {
 	assert.Equal(t, controller.CodeSuccess, res.Code)
 }
 
-func TestRegisterHandler_UsernameExist(t *testing.T) {
+func TestLoginHandler_UserNotExist(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	if err := InitMySQL(); err != nil {
 		t.Fatalf("MySQL start failed, err:%v\n", err)
 	}
 	defer sdbTest.Close()
-	url := "/register"
+	url := "/login"
 	r.POST(url, func(c *gin.Context) {
-		controller.RegisterHandler(c, sdbTest)
+		controller.LoginHandler(c, sdbTest)
 	})
 
 	body := `{
-		"username" : "user1",
-        "password" : "1234",
-        "re_password":"1234"
+		"username" : "NotExistUser",
+        "password" : "1234"
 	}`
 
 	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewReader([]byte(body)))
@@ -73,5 +71,36 @@ func TestRegisterHandler_UsernameExist(t *testing.T) {
 	if err := json.Unmarshal(w.Body.Bytes(), res); err != nil {
 		t.Fatalf("json.Unmarshal w.Body failed, err:%v\n", err)
 	}
-	assert.Equal(t, controller.CodeUserExist, res.Code)
+	assert.Equal(t, controller.CodeUserNotExist, res.Code)
+}
+
+func TestLoginHandler_InvalidPassword(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	r := gin.Default()
+	if err := InitMySQL(); err != nil {
+		t.Fatalf("MySQL start failed, err:%v\n", err)
+	}
+	defer sdbTest.Close()
+	url := "/login"
+	r.POST(url, func(c *gin.Context) {
+		controller.LoginHandler(c, sdbTest)
+	})
+
+	body := `{
+		"username" : "xiaohao",
+        "password" : "InvalidPassword"
+	}`
+
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewReader([]byte(body)))
+
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, 200, w.Code)
+
+	res := new(controller.ResponseData)
+	if err := json.Unmarshal(w.Body.Bytes(), res); err != nil {
+		t.Fatalf("json.Unmarshal w.Body failed, err:%v\n", err)
+	}
+	assert.Equal(t, controller.CodeInvalidPassword, res.Code)
 }

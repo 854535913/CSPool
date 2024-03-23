@@ -1,37 +1,47 @@
 import {ref} from "vue";
-import request from '@/utils/request'; // 引入预配置的axios实例
+import request from '@/utils/request';
+import {ElMessage} from "element-plus"; // 引入预配置的axios实例
 
 export const registerData = ref({
     username:"",
     password:"",
-    re_password:""
+    re_password:"",
+    invitation:""
 })
 
 export const registerRules = {
     username: [
-        { required: true, message: '请输入用户名', trigger: 'blur' },
+        { required: true, message: 'username can\'t be empty', trigger: 'blur' },
     ],
     password: [
-        { required: true, message: '请输入密码', trigger: 'blur' },
-        { min: 5, max: 16, message: '长度为5~16位非空字符', trigger: 'blur' }
+        { required: true, message: 'password can\'t be empty', trigger: 'blur' },
+        { min: 4, max: 16, message: 'password must be 4 to 16 non-blank characters in length', trigger: 'blur' }
     ],
     re_password: [
-        { required: true, message: '请再次输入密码', trigger: 'blur' },
-        { min: 5, max: 16, message: '长度为5~16位非空字符', trigger: 'blur' }
+        { required: true, message: 'password can\'t be empty', trigger: 'blur' },
+        { min: 4, max: 16, message: 'password must be 4 to 16 non-blank characters in length', trigger: 'blur' }
     ]
 }
 
 export const registerService = async () => {
     try {
-        const response = await request.post('/register', registerData.value);
+        const response = await request.post('/user/register', registerData.value);
         // 注意这里使用 response.data.code 和 response.data.msg 访问响应数据
         if(response.data.code === 1000){
-            alert(response.data.msg ? response.data.msg : '注册成功');
+            ElMessage.success(response.data.msg ? response.data.msg : 'register success');
         } else {
-            alert(response.data.msg ? response.data.msg : '注册失败');
+            ElMessage.error(response.data.msg ? response.data.msg : 'register failed');
         }
     } catch (error) {
         console.error(error);
-        alert('发生错误');
     }
 };
+
+export const clearRegisterData = ()=>{
+    registerData.value={
+        username:'',
+        password:'',
+        rePassword:'',
+        invitation:''
+    }
+}

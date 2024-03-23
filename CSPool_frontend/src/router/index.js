@@ -1,23 +1,28 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
-import RegisterView from '../views/Register.vue';
+import { createRouter, createWebHistory } from 'vue-router'
+import LoginRegisterView from '../views/LoginRegister.vue';
 import HomeView from '../views/Home.vue';
+import UploadPostView from '../views/PostUpload.vue';
+import TimeListView from '../views/PostShow.vue';
 
 const routes = [
   {
     path: '/',
     name: 'Home',
     component: HomeView,
+    children: [
+      { path: '/post/upload', component: UploadPostView },
+      { path: '/post/list', component: TimeListView },
+    ]
   },
   {
-    path: '/register', // 定义路由路径
-    name: 'register', // 定义路由名称
-    component: RegisterView, // 指定路由组件
+    path: '/user/login', // 定义路由路径
+    component: LoginRegisterView, // 指定路由组件
   },
 ]
 
 const router = createRouter({
-  history: createWebHashHistory(),
-  routes
+  history: createWebHistory(),
+  routes:routes
 })
 
 export default router

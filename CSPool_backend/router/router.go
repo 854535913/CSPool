@@ -15,12 +15,19 @@ func Init() *gin.Engine {
 	r.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
-	r.POST("/register", func(c *gin.Context) {
-		controller.RegisterHandler(c, dbMysql)
-	})
-	r.POST("/login", func(c *gin.Context) {
-		controller.LoginHandler(c, dbMysql)
-	})
+
+	userGroup := r.Group("/user")
+	{
+		userGroup.POST("/register", func(c *gin.Context) {
+			controller.RegisterHandler(c, dbMysql)
+		})
+		userGroup.POST("/login", func(c *gin.Context) {
+			controller.LoginHandler(c, dbMysql)
+		})
+		userGroup.GET("/info", controller.JWTAuthMiddleware(), func(c *gin.Context) {
+			controller.GetUseriInfoHandler(c, dbMysql)
+		})
+	}
 
 	postGroup := r.Group("/post", controller.JWTAuthMiddleware())
 	{
@@ -28,15 +35,21 @@ func Init() *gin.Engine {
 			controller.UploadHandler(c, dbMysql, dbRedis)
 		})
 		postGroup.GET("/:id", func(c *gin.Context) {
-			controller.GetVideoByIDHandler(c, dbMysql)
+			controller.GetPostByIDHandler(c, dbMysql)
 		})
 		postGroup.GET("/time", func(c *gin.Context) {
-			controller.GetVideolistByTimeHandler(c, dbMysql, dbRedis)
+			controller.GetPostlistByTimeHandler(c, dbMysql, dbRedis)
 		})
 		postGroup.GET("/like", func(c *gin.Context) {
-			controller.GetVideolistByLikeHandler(c, dbMysql, dbRedis)
+			controller.GetPostlistByLikeHandler(c, dbMysql, dbRedis)
 		})
-		postGroup.POST("/review/:id", func(c *gin.Context) {
+		postGroup.GET("/review",
+			func(c *gin.Context) {
+				controller.CheckAdminAuthority(c, dbMysql)
+			}, func(c *gin.Context) {
+				controller.GetPostlistByUnderreviewHandler(c, dbMysql)
+			})
+		postGroup.POST("/publish/:id", func(c *gin.Context) {
 			controller.ReviewHandler(c, dbMysql, dbRedis)
 		})
 		postGroup.POST("/:id/:action", func(c *gin.Context) {

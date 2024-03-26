@@ -26,7 +26,7 @@ func UploadPostService(sdb *sql.DB, rdb *redis.Client, input model.PostInfo) (pi
 	if err != nil {
 		return 0, err
 	}
-	if level == 1 {
+	if level == 1 || level == 2 {
 		err = mysqlmodule.AuthorizePost(sdb, pid)
 
 		if err != nil {
@@ -78,6 +78,22 @@ func GetPostlistByTimeService(sdb *sql.DB, rdb *redis.Client) (postlist []model.
 
 func GetPostlistByLikeService(sdb *sql.DB, rdb *redis.Client) (postlist []model.PostInfo, err error) {
 	pidlist, err := redismodule.GetLikeList(rdb)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, id := range pidlist {
+		info, err := GetPostByIDService(sdb, id)
+		if err != nil {
+			return nil, err
+		}
+		postlist = append(postlist, info)
+	}
+	return postlist, nil
+}
+
+func GetPostlistByUnderreviewService(sdb *sql.DB) (postlist []model.PostInfo, err error) {
+	pidlist, err := mysqlmodule.GetPostIDByUnderreview(sdb)
 	if err != nil {
 		return nil, err
 	}

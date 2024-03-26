@@ -38,3 +38,8 @@ func CheckLevelService(db *sql.DB, username string) (allow bool, err error) {
 	}
 	return true, err
 }
+
+func GetUserinfoByID(db *sql.DB, userid int64) (userinfo model.UserInfo, err error) {
+	userinfo, err = mysqlmodule.GetUserInfo(db, userid)
+	return userinfo, err
+}

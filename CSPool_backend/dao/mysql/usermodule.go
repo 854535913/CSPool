@@ -2,7 +2,6 @@ package mysqlmodule
 
 import (
 	"database/sql"
-	"log"
 	"main/model"
 )
 
@@ -40,17 +39,17 @@ func Login(db *sql.DB, info model.LoginInfo) (match bool, err error) {
 func GetID(db *sql.DB, username string) (id int64, err error) {
 	sqlStr := "SELECT id FROM user WHERE username = ?"
 	err = db.QueryRow(sqlStr, username).Scan(&id)
-	if err != nil {
-		log.Fatalf("Failed to get ID: %v", err)
-	}
 	return id, err
 }
 
 func GetLevel(db *sql.DB, username string) (level int8, err error) {
 	sqlStr := "SELECT level FROM user WHERE username = ?"
 	err = db.QueryRow(sqlStr, username).Scan(&level)
-	if err != nil {
-		log.Fatalf("Failed to get level: %v", err)
-	}
 	return level, err
+}
+
+func GetUserInfo(db *sql.DB, userid int64) (info model.UserInfo, err error) {
+	sqlStr := "SELECT username, level FROM user WHERE id = ?"
+	err = db.QueryRow(sqlStr, userid).Scan(&info.Username, &info.Level)
+	return info, err
 }

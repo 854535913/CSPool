@@ -40,7 +40,7 @@ onMounted(async () => {
         <h1>Author: {{ post.authorName }}</h1>
         <div class="content">{{ post.description }}</div>
         <div>
-          <el-link type="info" :href="post.link" :icon="Link" style="font-size: 20px">Original webpage</el-link>
+          <el-link type="info" :href="post.link" :icon="Link" style="font-size: 20px">Link</el-link>
         </div>
         <div class="like">
           <el-icon size="25px"><Star /></el-icon>
@@ -61,7 +61,7 @@ onMounted(async () => {
         <h1>Author: {{ post.authorName }}</h1>
         <div class="content">{{ post.description }}</div>
         <div>
-          <el-link type="info" :href="post.link" :icon="Link" style="font-size: 20px">Original webpage</el-link>
+          <el-link type="info" :href="post.link" :icon="Link" style="font-size: 20px">Link</el-link>
         </div>
         <div class="like">
           <el-icon size="25px"><Star /></el-icon>

@@ -98,3 +98,20 @@ func UpdateVote(db *sql.DB, info model.VoteInfo, newstatus int) (err error) {
 	_, err = db.Exec(sqlStr, newstatus, info.VoteTime, info.VoterID, info.PostIDInt64)
 	return err
 }
+
+func GetPostIDByUnderreview(db *sql.DB) (pidlist []int64, err error) {
+	sqlStr := "SELECT id FROM post_underreview"
+	rows, err := db.Query(sqlStr)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		pidlist = append(pidlist, id)
+	}
+	return pidlist, err
+}

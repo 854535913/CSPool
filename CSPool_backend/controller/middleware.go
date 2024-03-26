@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"github.com/gin-gonic/gin"
 	"main/service"
 	"strings"
@@ -35,4 +36,24 @@ func JWTAuthMiddleware() func(c *gin.Context) {
 		c.Set("Username", info.Username)
 		c.Next() // 后续的处理函数可以用过c.Get("username")来获取当前请求的用户信息
 	}
+}
+
+func CheckAdminAuthority(c *gin.Context, sdb *sql.DB) {
+	username, exist := c.Get("Username")
+	if !exist {
+		ResponseError(c, CodeCantGetUsername)
+		return
+	}
+	usernamestring, _ := username.(string)
+	allow, err := service.CheckLevelService(sdb, usernamestring)
+	if err != nil {
+		ResponseErrorWithMsg(c, CodeUnexpectedError, err.Error())
+		c.Abort()
+		return
+	} else if !allow {
+		ResponseError(c, CodeNeedLevel)
+		c.Abort()
+		return
+	}
+	c.Next()
 }

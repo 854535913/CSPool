@@ -47,3 +47,18 @@ func LoginHandler(c *gin.Context, db *sql.DB) {
 	}
 	ResponseSuccess(c, token)
 }
+
+func GetUseriInfoHandler(c *gin.Context, db *sql.DB) {
+	userid, exist := c.Get("UserID")
+	if !exist {
+		ResponseError(c, CodeCantGetUserID)
+		return
+	}
+	useridInt64, _ := userid.(int64)
+	userinfo, err := service.GetUserinfoByID(db, useridInt64)
+	if err != nil {
+		ResponseErrorWithMsg(c, CodeUnexpectedError, err.Error())
+		return
+	}
+	ResponseSuccess(c, userinfo)
+}

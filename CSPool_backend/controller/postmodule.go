@@ -41,7 +41,7 @@ func UploadHandler(c *gin.Context, sdb *sql.DB, rdb *redis.Client) {
 	ResponseSuccess(c, vid)
 }
 
-func GetVideoByIDHandler(c *gin.Context, sdb *sql.DB) {
+func GetPostByIDHandler(c *gin.Context, sdb *sql.DB) {
 	pidstring := c.Param("id")
 	pidint64, _ := strconv.ParseInt(pidstring, 10, 64)
 	var info model.PostInfo
@@ -62,7 +62,7 @@ func GetVideoByIDHandler(c *gin.Context, sdb *sql.DB) {
 	ResponseSuccess(c, info)
 }
 
-func GetVideolistByTimeHandler(c *gin.Context, sdb *sql.DB, rdb *redis.Client) {
+func GetPostlistByTimeHandler(c *gin.Context, sdb *sql.DB, rdb *redis.Client) {
 	postlist, err := service.GetPostlistByTimeService(sdb, rdb)
 	if err != nil {
 		ResponseErrorWithMsg(c, CodeUnexpectedError, err.Error())
@@ -71,8 +71,17 @@ func GetVideolistByTimeHandler(c *gin.Context, sdb *sql.DB, rdb *redis.Client) {
 	ResponseSuccess(c, postlist)
 }
 
-func GetVideolistByLikeHandler(c *gin.Context, sdb *sql.DB, rdb *redis.Client) {
+func GetPostlistByLikeHandler(c *gin.Context, sdb *sql.DB, rdb *redis.Client) {
 	postlist, err := service.GetPostlistByLikeService(sdb, rdb)
+	if err != nil {
+		ResponseErrorWithMsg(c, CodeUnexpectedError, err.Error())
+		return
+	}
+	ResponseSuccess(c, postlist)
+}
+
+func GetPostlistByUnderreviewHandler(c *gin.Context, sdb *sql.DB) {
+	postlist, err := service.GetPostlistByUnderreviewService(sdb)
 	if err != nil {
 		ResponseErrorWithMsg(c, CodeUnexpectedError, err.Error())
 		return
@@ -84,7 +93,6 @@ func ReviewHandler(c *gin.Context, sdb *sql.DB, rdb *redis.Client) {
 	username, exist := c.Get("Username")
 	if !exist {
 		ResponseError(c, CodeCantGetUsername)
-
 		return
 	}
 	pidstring := c.Param("id")

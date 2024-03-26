@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
+import {onMounted} from 'vue'
 import {House, Monitor, More} from "@element-plus/icons-vue";
 import {getUserInfoService} from "@/api/user";
 import useUserInfoStore from '@/store/userInfo.js'
@@ -20,17 +20,24 @@ onMounted(async () => {
     <el-container>
       <el-header>
         <el-menu
-            class="el-menu-demo"
+            class="menu1"
             mode="horizontal"
             :ellipsis="false"
             :router="true"
             @select="handleSelect"
         >
           <el-menu-item index="0">
-            <h3>CSPool</h3>
+            <h3 style="font-size: 30px">CSPool</h3>
           </el-menu-item>
           <div class="flex-grow" />
-          <el-menu-item index="/user/login"><span style="font-size: 18px;">Login</span></el-menu-item>
+          <div>
+            <el-menu-item v-if="userInfoStore.info.username" @click="logoutService()">
+              <span style="font-size: 18px;">Logout</span>
+            </el-menu-item>
+            <el-menu-item v-else index="/user/login">
+              <span style="font-size: 18px;">Login</span>
+            </el-menu-item>
+          </div>
           <el-sub-menu >
             <template #title>
               <span v-if="userInfoStore.info.username" style="font-size: 18px;">{{userInfoStore.info.level}}: {{userInfoStore.info.username}}</span>
@@ -43,8 +50,8 @@ onMounted(async () => {
       </el-header>
       <el-container>
         <el-aside width="200px">
-          <el-menu  class="el-menu-vertical-demo" :router="true" >
-            <el-menu-item >
+          <el-menu class="menu2" :router="true" >
+            <el-menu-item index="/home">
               <el-icon><House /></el-icon>
               <span>Home</span>
             </el-menu-item>
@@ -55,15 +62,15 @@ onMounted(async () => {
               </template>
               <el-menu-item index="/post/list">Post list</el-menu-item>
               <el-menu-item index="/post/upload">Create Post</el-menu-item>
+              <el-menu-item index="/post/review">Review Post</el-menu-item>
             </el-sub-menu>
             <el-sub-menu >
               <template #title>
                 <el-icon><More /></el-icon>
                 <span>Coming soon</span>
               </template>
-              <el-menu-item >module a</el-menu-item>
-              <el-menu-item >module b</el-menu-item>
-              <el-menu-item >module c</el-menu-item>
+              <el-menu-item >tools a</el-menu-item>
+              <el-menu-item >tools b</el-menu-item>
             </el-sub-menu>
           </el-menu>
         </el-aside>

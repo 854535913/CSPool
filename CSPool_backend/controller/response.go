@@ -15,6 +15,7 @@ const (
 	CodeUserNotExist
 	CodeInvalidPassword
 	CodeCantGetUsername
+	CodeCantGetUserID
 	CodeServerBusy
 
 	CodeTitleExist
@@ -41,6 +42,7 @@ var codeMsgMap = map[ResCode]string{
 	CodeUserNotExist:    "用户名不存在",
 	CodeInvalidPassword: "用户名或密码错误",
 	CodeCantGetUsername: "无法获取用户名",
+	CodeCantGetUserID:   "无法获取用户ID",
 	CodeServerBusy:      "服务繁忙",
 
 	CodeTitleExist:        "标题已存在",

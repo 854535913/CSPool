@@ -1,17 +1,22 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import LoginRegisterView from '../views/LoginRegister.vue';
-import HomeView from '../views/Home.vue';
+import LayoutView from '../views/Layout.vue';
 import UploadPostView from '../views/PostUpload.vue';
 import TimeListView from '../views/PostShow.vue';
+import ReviewView from '../views/PostReview.vue';
+import HomeView from '../views/Homepage.vue';
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    component: HomeView,
+    component: LayoutView,
+    redirect:'/home',
     children: [
+      { path: '/home', component: HomeView },
       { path: '/post/upload', component: UploadPostView },
       { path: '/post/list', component: TimeListView },
+      { path: '/post/review', component: ReviewView },
     ]
   },
   {

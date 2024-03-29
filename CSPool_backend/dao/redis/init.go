@@ -2,16 +2,18 @@ package redismodule
 
 import (
 	"context"
+	"fmt"
 	"github.com/go-redis/redis/v8"
+	"main/appconfig"
 )
 
 var Rdb *redis.Client
 
-func Init() (err error) {
+func Init(cfg *appconfig.RedisConfig) (err error) {
 	Rdb = redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379", // Redis地址
-		Password: "",               // 密码，没有则留空
-		DB:       0,                // 默认数据库
+		Addr:     fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
+		Password: cfg.Password,
+		DB:       cfg.DB,
 	})
 
 	ctx := context.Background()
@@ -21,4 +23,8 @@ func Init() (err error) {
 		return err
 	}
 	return
+}
+
+func Close() {
+	_ = Rdb.Close()
 }
